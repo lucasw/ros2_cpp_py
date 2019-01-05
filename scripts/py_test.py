@@ -6,6 +6,8 @@
 import rclpy
 from rclpy.node import Node
 
+from ros2_cpp_py_package.msg import Test
+from ros2_cpp_py_package.srv import Test2
 
 class PyTalker(Node):
     def __init__(self):
@@ -24,6 +26,9 @@ class PyTalker(Node):
 
 def main(args=None):
     rclpy.init(args=args)
+
+    print(Test.FOO)
+    print(Test2.Request.SOME)
 
     pytalker = PyTalker()
     rclpy.spin(pytalker)

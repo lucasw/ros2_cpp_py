@@ -12,8 +12,15 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 find_package(ament_cmake REQUIRED)
-
 find_package(rclcpp REQUIRED)
+find_package(rosidl_cmake REQUIRED)
+find_package(rosidl_default_generators REQUIRED)
+
+rosidl_generate_interfaces(${PROJECT_NAME}
+  "msg/Test.msg"
+  "srv/Test2.srv"
+  # DEPENDENCIES std_msgs
+)
 
 add_executable(cpp_test
   src/cpp_test.cpp
