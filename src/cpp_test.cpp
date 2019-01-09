@@ -22,7 +22,11 @@ private:
 class CppTest : public rclcpp::Node {
  public:
   CppTest() : Node("cpptest"), count_(0) {
-    timer_ = this->create_wall_timer(1s, std::bind(&CppTest::timer_callback_, this));
+    int test = 0;
+    get_parameter_or("test", test, 43);
+    set_parameter_if_not_set("test", test);
+    RCLCPP_INFO(get_logger(), "test param value %d", test);
+    timer_ = this->create_wall_timer(3s, std::bind(&CppTest::timer_callback_, this));
   }
 
   ~CppTest() {
