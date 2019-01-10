@@ -27,13 +27,12 @@ private:
 class CppTest : public rclcpp::Node {
  public:
   CppTest() : Node("cpptest"), count_(0) {
-    int test = 0;
-    get_parameter_or("test", test, 43);
-    set_parameter_if_not_set("test", test);
-    RCLCPP_INFO(get_logger(), "test param value %d", test);
+    get_parameter_or("test", test_, 43);
+    set_parameter_if_not_set("test", test_);
+    RCLCPP_INFO(get_logger(), "test param value %d", test_);
     timer_ = this->create_wall_timer(3s, std::bind(&CppTest::timer_callback_, this));
 
-#if 0
+#if 1
     parameters_client_ = std::make_shared<rclcpp::AsyncParametersClient>(this);
     param_sub_ = parameters_client_->on_parameter_event(
         std::bind(&CppTest::onParameterEvent, this, _1));
@@ -52,11 +51,11 @@ class CppTest : public rclcpp::Node {
     // TODO(lucasw) does the name here do anything?
     // const std::string full_name = std::string(get_namespace()) + std::string(get_name());
     // parameters_client_ = std::make_shared<rclcpp::AsyncParametersClient>(this, full_name);
-    #if 0
+#if 1
     parameters_client_ = std::make_shared<rclcpp::AsyncParametersClient>(this);
     param_sub_ = parameters_client_->on_parameter_event(
         std::bind(&CppTest::onParameterEvent, this, _1));
-    #endif
+#endif
   }
 
  private:
@@ -70,25 +69,34 @@ class CppTest : public rclcpp::Node {
 #endif
   rclcpp::TimerBase::SharedPtr timer_;
   size_t count_;
+  int test_ = 0;
 
   rclcpp::AsyncParametersClient::SharedPtr parameters_client_;
   rclcpp::Subscription<rcl_interfaces::msg::ParameterEvent>::SharedPtr param_sub_;
   void onParameterEvent(const rcl_interfaces::msg::ParameterEvent::SharedPtr event) {
     const std::string full_name = std::string(get_namespace()) + std::string(get_name());
+    if (event->node != full_name) {
+      return;
+    }
     std::cout << full_name << ", event node: " << event->node << "\n";
 
-    std::cout << "new:\n ";
+    std::cout << "new: ";
     for (auto param : event->new_parameters) {
       std::cout << param.name << " ";
     }
-    std::cout << "\nchanged:\n ";
+    std::cout << "\nchanged: ";
     for (auto param : event->changed_parameters) {
       std::cout << param.name << " ";
     }
-    std::cout << "\ndeleted:\n ";
+    std::cout << "\ndeleted: ";
     for (auto param : event->deleted_parameters) {
       std::cout << param.name << " ";
     }
+
+    // the parameter is updated regardless of what happens above
+    const auto old_val = test_;
+    get_parameter_or("test", test_, test_);
+    std::cout << "\nvalue of test " << test_ << ", was " << old_val << "\n";
   }
 };
 
