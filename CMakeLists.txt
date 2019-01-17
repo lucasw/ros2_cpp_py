@@ -15,6 +15,7 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rosidl_cmake REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
+find_package(rcutils REQUIRED)
 
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/Test.msg"
@@ -27,6 +28,7 @@ add_executable(cpp_test
 )
 ament_target_dependencies(cpp_test
   "rclcpp"
+  "rcutils"
 )
 
 # Install cpp executables
@@ -40,5 +42,7 @@ install(PROGRAMS
   scripts/py_test.py
   DESTINATION lib/${PROJECT_NAME}
 )
+
+install(DIRECTORY launch DESTINATION share/${PROJECT_NAME})
 
 ament_package()
