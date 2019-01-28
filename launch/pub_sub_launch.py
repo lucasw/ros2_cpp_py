@@ -48,6 +48,10 @@ def generate_launch_description():
             ),
         launch_ros.actions.Node(
             package='ros2_cpp_py', node_executable='ros2_sub_test', output='screen',
-            node_name='ros2_sub_test',
+            node_name='ros2_sub_test_a',
+            ),
+        launch_ros.actions.Node(
+            package='ros2_cpp_py', node_executable='ros2_sub_test', output='screen',
+            node_name='ros2_sub_test_b',
             ),
     ])
