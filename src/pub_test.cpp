@@ -61,11 +61,9 @@ Color::Color()
   get_parameter_or("blue", blue_, blue_);
   // this works okay but would rather get width and height from
   // an input image
-  set_parameter_if_not_set("width", width_);
-  get_parameter_or("width", width_, width_);
-  set_parameter_if_not_set("height", height_);
-  get_parameter_or("height", height_, height_);
 #endif
+  ros::param::get("~width", width_);
+  ros::param::get("~height", height_);
   ros::param::get("~frame_rate", frame_rate_);
 
   pub_ = nh_.advertise<sensor_msgs::Image>("image", 10);
