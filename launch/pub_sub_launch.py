@@ -22,10 +22,19 @@ import launch_ros.actions
 
 def generate_launch_description():
     return LaunchDescription([
+        launch.actions.DeclareLaunchArgument(
+            'frame_rate',
+            default_value='30.0',
+            description='publish frame rate',
+            ),
         launch_ros.actions.Node(
             package='ros2_cpp_py', node_executable='ros2_pub_test', output='screen',
             node_name='ros2_pub_test',
-            parameters=[{"width": 1024, "height": 1024, "frame_rate": 30.0}],
+            parameters=[{
+                "width": 1024,
+                "height": 1024,
+                "frame_rate": launch.substitutions.LaunchConfiguration('frame_rate'),
+                }],
             ),
         launch_ros.actions.Node(
             package='ros2_cpp_py', node_executable='ros2_sub_test', output='screen',

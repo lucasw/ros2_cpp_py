@@ -13,7 +13,7 @@ public:
   SubTest() : Node("cpptest")
   {
     RCLCPP_INFO(get_logger(), "sub test");
-    timer_ = this->create_wall_timer(1s, std::bind(&SubTest::update, this));
+    timer_ = this->create_wall_timer(4s, std::bind(&SubTest::update, this));
     sub_ = create_subscription<sensor_msgs::msg::Image>("image",
         std::bind(&SubTest::callback, this, _1));
   }
@@ -50,7 +50,7 @@ private:
     }
 
     auto last_diff = cur - stamps_.back();
-    if (last_diff.nanoseconds() > 1e9) {
+    if (last_diff.nanoseconds() > 4e9) {
       RCLCPP_INFO(get_logger(), "time since last message %f", last_diff.nanoseconds() / 1e9);
     } else {
       const double rate = static_cast<double>(stamps_.size()) / ((cur - stamps_.front()).nanoseconds() / 1e9);
