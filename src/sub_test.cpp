@@ -13,7 +13,7 @@ public:
   SubTest()
   {
     ROS_INFO("sub test");
-    timer_ = nh_.createTimer(ros::Duration(1.0),
+    timer_ = nh_.createTimer(ros::Duration(update_period_),
         &SubTest::update, this);
     sub_ = nh_.subscribe<sensor_msgs::Image>("image", 10,
         &SubTest::callback, this);
@@ -35,6 +35,7 @@ private:
     stamps_.push_back(msg->header.stamp);
   }
 
+  const float update_period_ = 4.0;
   ros::Timer timer_;
   void update(const ros::TimerEvent& e)
   {
@@ -47,13 +48,13 @@ private:
     }
 
     // TODO(lucasw) make these threshold configurable
-    while ((((cur - stamps_.front()).toSec() > 2.0) && (stamps_.size() > 50)) ||
+    while ((((cur - stamps_.front()).toSec() > update_period_) && (stamps_.size() > 50)) ||
            (stamps_.size() > 200)) {
       stamps_.pop_front();
     }
 
     auto last_diff = cur - stamps_.back();
-    if (last_diff.toSec() > 1) {
+    if (last_diff.toSec() > 4.0) {
       ROS_INFO("time since last message %f", last_diff.toSec());
     } else {
       const double rate = static_cast<double>(stamps_.size()) / ((cur - stamps_.front()).toSec());
