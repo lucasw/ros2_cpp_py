@@ -23,6 +23,16 @@ import launch_ros.actions
 def generate_launch_description():
     return LaunchDescription([
         launch.actions.DeclareLaunchArgument(
+            'width',
+            default_value='1024',
+            description='generated image width',
+            ),
+        launch.actions.DeclareLaunchArgument(
+            'height',
+            default_value='1024',
+            description='generated image height',
+            ),
+        launch.actions.DeclareLaunchArgument(
             'frame_rate',
             default_value='30.0',
             description='publish frame rate',
@@ -31,8 +41,8 @@ def generate_launch_description():
             package='ros2_cpp_py', node_executable='ros2_pub_test', output='screen',
             node_name='ros2_pub_test',
             parameters=[{
-                "width": 1024,
-                "height": 1024,
+                "width": launch.substitutions.LaunchConfiguration('width'),
+                "height": launch.substitutions.LaunchConfiguration('height'),
                 "frame_rate": launch.substitutions.LaunchConfiguration('frame_rate'),
                 }],
             ),
