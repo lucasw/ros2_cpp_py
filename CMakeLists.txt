@@ -12,6 +12,7 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 find_package(ament_cmake REQUIRED)
+find_package(cv_bridge REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rcutils REQUIRED)
 find_package(rosidl_cmake REQUIRED)
@@ -32,6 +33,15 @@ ament_target_dependencies(cpp_test
   "rcutils"
 )
 
+add_executable(pub_test
+  src/pub_test.cpp
+)
+ament_target_dependencies(pub_test
+  "cv_bridge"
+  "rclcpp"
+  "sensor_msgs"
+)
+
 add_executable(sub_test
   src/sub_test.cpp
 )
@@ -43,6 +53,7 @@ ament_target_dependencies(sub_test
 # Install cpp executables
 install(TARGETS
   cpp_test
+  pub_test
   sub_test
 DESTINATION lib/${PROJECT_NAME}
 )

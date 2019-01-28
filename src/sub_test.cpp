@@ -12,6 +12,7 @@ class SubTest : public rclcpp::Node
 public:
   SubTest() : Node("cpptest")
   {
+    RCLCPP_INFO(get_logger(), "sub test");
     timer_ = this->create_wall_timer(1s, std::bind(&SubTest::update, this));
     sub_ = create_subscription<sensor_msgs::msg::Image>("image",
         std::bind(&SubTest::callback, this, _1));
@@ -19,7 +20,7 @@ public:
 
   ~SubTest()
   {
-    std::cout << "sub test shutting down\n";
+    RCLCPP_INFO(get_logger(), "sub test shutting down");
   }
 
 private:
@@ -38,7 +39,7 @@ private:
     auto cur = now();
 
     if (stamps_.size() < 2) {
-      std::cout << "Not enough received messages\n";
+      RCLCPP_WARN(get_logger(), "Not enough received messages");
       return;
     }
 
@@ -50,13 +51,13 @@ private:
 
     auto last_diff = cur - stamps_.back();
     if (last_diff.nanoseconds() > 1e9) {
-      std::cout << last_diff.nanoseconds() / 1e9 << " since last message\n";
+      RCLCPP_INFO(get_logger(), "time since last message %f", last_diff.nanoseconds() / 1e9);
     } else {
       const double rate = static_cast<double>(stamps_.size()) / ((cur - stamps_.front()).nanoseconds() / 1e9);
       // for (auto stamp : stamps) {
       //
       // }
-      std::cout << "messages per second " << rate << "\n";
+      RCLCPP_INFO(get_logger(), "messages per second %f", rate);
     }
   }
 };
