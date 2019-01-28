@@ -9,7 +9,11 @@
     <param name="height" value="$(arg height)" />
     <param name="frame_rate" value="$(arg frame_rate)" />
   </node>
-  <node name="ros1_sub_test" pkg="ros2_cpp_py" type="ros1_sub_test"
+  <node name="ros1_sub_test_a" pkg="ros2_cpp_py" type="ros1_sub_test"
       output="screen">
   </node>
+  <node name="ros1_sub_test_b" pkg="ros2_cpp_py" type="ros1_sub_test"
+      output="screen">
+  </node>
+
 </launch>
