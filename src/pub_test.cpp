@@ -20,18 +20,19 @@
 // borrowed this code from https://github.com/lucasw/image_manip
 
 #include <cv_bridge/cv_bridge.h>
-#include <rclcpp/rclcpp.hpp>
-#include <sensor_msgs/msg/image.hpp>
-#include <sensor_msgs/image_encodings.hpp>
-using std::placeholders::_1;
+#include <ros/ros.h>
+#include <sensor_msgs/Image.h>
+#include <sensor_msgs/image_encodings.h>
+// using std::placeholders::_1;
 
-class Color : public rclcpp::Node
+class Color
 {
 protected:
-  rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr pub_;
+  ros::NodeHandle nh_;
+  ros::Publisher pub_;
 
-  rclcpp::TimerBase::SharedPtr timer_;
-  void pubImage();
+  ros::Timer timer_;
+  void pubImage(const ros::TimerEvent& e);
 
   int width_ = 1024;
   int height_ = 1024;
@@ -49,8 +50,9 @@ public:
   Color();
 };
 
-Color::Color() : Node("color")
+Color::Color()
 {
+#if 0
   set_parameter_if_not_set("red", red_);
   get_parameter_or("red", red_, red_);
   set_parameter_if_not_set("green", green_);
@@ -65,59 +67,62 @@ Color::Color() : Node("color")
   get_parameter_or("height", height_, height_);
   set_parameter_if_not_set("frame_rate", frame_rate_);
   get_parameter_or("frame_rate", frame_rate_, frame_rate_);
+#endif
 
-  pub_ = create_publisher<sensor_msgs::msg::Image>("image");
+  pub_ = nh_.advertise<sensor_msgs::Image>("image", 10);
 
-  RCLCPP_INFO(get_logger(), "%d x %d",  width_, height_);
+  ROS_INFO("%d x %d",  width_, height_);
   updateTimer();
 }
 
 void Color::updateTimer()
 {
   if (frame_rate_ > 0.0) {
-    int period_ms = 1000.0 / frame_rate_;
-    RCLCPP_INFO(get_logger(), "frame rate: %f, period ms %d", frame_rate_, period_ms);
-    timer_ = create_wall_timer(std::chrono::milliseconds(period_ms),
-        std::bind(&Color::pubImage, this));
+    const double period_s = 1.0 / frame_rate_;
+    ROS_INFO("frame rate: %f, period s %f", frame_rate_, period_s);
+    timer_ = nh_.createTimer(ros::Duration(period_s),
+        &Color::pubImage, this);
   } else {
-    RCLCPP_WARN(get_logger(), "setting frame rate to 0.0");
-    timer_ = nullptr;
+    ROS_WARN("setting frame rate to 0.0");
+    // TODO(lucasw)
+    // timer_ = nullptr;
   }
 }
 
-void Color::pubImage()
+void Color::pubImage(const ros::TimerEvent& e)
 {
+  (void)e;
   if (dirty_ || image_.empty()) {
+#if 0
     get_parameter_or("red", red_, red_);
     get_parameter_or("green", green_, green_);
     get_parameter_or("blue", blue_, blue_);
     get_parameter_or("width", width_, width_);
     get_parameter_or("height", height_, height_);
-
+#endif
     image_ = cv::Mat(cv::Size(width_, height_), CV_8UC3);
     image_ = cv::Scalar(red_, green_, blue_);
     dirty_ = false;
   }
 
   cv_bridge::CvImage cv_image;
-  cv_image.header.stamp = now();  // or reception time of original message?
+  cv_image.header.stamp = ros::Time::now();  // or reception time of original message?
   cv_image.image = image_;
   cv_image.encoding = "rgb8";
   // TODO(lucasw) cache the converted image message and only call toImageMsg() above
   // in if dirty.
-  pub_->publish(cv_image.toImageMsg());
+  pub_.publish(cv_image.toImageMsg());
 }
 
 int main(int argc, char** argv)
 {
-  rclcpp::init(argc, argv);
+  ros::init(argc, argv, "pub_test");
 
   // Force flush of the stdout buffer.
   // This ensures a correct sync of all prints
   // even when executed simultaneously within a launch file.
-  setvbuf(stdout, NULL, _IONBF, BUFSIZ);
+  // setvbuf(stdout, NULL, _IONBF, BUFSIZ);
   auto color = std::make_shared<Color>();
-  rclcpp::spin(color);
-  rclcpp::shutdown();
+  ros::spin();
   return 0;
 }

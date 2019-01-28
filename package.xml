@@ -1,23 +1,30 @@
 <?xml version="1.0"?>
-<?xml-model href="http://download.ros.org/schema/package_format2.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
-<package format="3">
+<package>
   <name>ros2_cpp_py</name>
   <version>0.0.0</version>
   <description>TODO: Package description</description>
-  <maintainer email="jacob@todo.todo">jacob</maintainer>
+  <maintainer email="wsacul@gmail.com">Lucas Walter</maintainer>
   <license>TODO: License declaration</license>
 
-  <buildtool_depend>ament_cmake</buildtool_depend>
+  <maintainer email="wsacul@gmail.com">Lucas Walter</maintainer>
 
-  <depend>rclcpp</depend>
-  <depend>rclpy</depend>
+  <license>BSD 3.0</license>
 
-  <buildtool_depend>rosidl_default_generators</buildtool_depend>
-  <exec_depend>rosidl_default_runtime</exec_depend>
+  <url type="website">https://github.com/lucasw/lambda</url>
 
-  <member_of_group>rosidl_interface_packages</member_of_group>
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>cv_bridge</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <run_depend>cv_bridge</run_depend>
+  <run_depend>nodelet</run_depend>
+  <run_depend>roscpp</run_depend>
+  <run_depend>sensor_msgs</run_depend>
+  <run_depend>std_msgs</run_depend>
 
   <export>
-    <build_type>ament_cmake</build_type>
+    <!-- nodelet plugin="${prefix}/nodelet_lambda_ros.xml" /-->
   </export>
+
 </package>
