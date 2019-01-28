@@ -15,6 +15,7 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rosidl_cmake REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
+find_package(sensor_msgs REQUIRED)
 
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/Test.msg"
@@ -29,9 +30,18 @@ ament_target_dependencies(cpp_test
   "rclcpp"
 )
 
+add_executable(sub_test
+  src/sub_test.cpp
+)
+ament_target_dependencies(sub_test
+  "rclcpp"
+  "sensor_msgs"
+)
+
 # Install cpp executables
 install(TARGETS
   cpp_test
+  sub_test
 DESTINATION lib/${PROJECT_NAME}
 )
 
