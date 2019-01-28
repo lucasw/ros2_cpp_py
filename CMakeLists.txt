@@ -13,6 +13,7 @@ endif()
 
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(rcutils REQUIRED)
 find_package(rosidl_cmake REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 find_package(sensor_msgs REQUIRED)
@@ -28,6 +29,7 @@ add_executable(cpp_test
 )
 ament_target_dependencies(cpp_test
   "rclcpp"
+  "rcutils"
 )
 
 add_executable(sub_test
@@ -50,5 +52,7 @@ install(PROGRAMS
   scripts/py_test.py
   DESTINATION lib/${PROJECT_NAME}
 )
+
+install(DIRECTORY launch DESTINATION share/${PROJECT_NAME})
 
 ament_package()
