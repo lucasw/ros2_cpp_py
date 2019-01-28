@@ -23,12 +23,12 @@ import launch_ros.actions
 def generate_launch_description():
     return LaunchDescription([
         launch_ros.actions.Node(
-            package='ros2_cpp_py', node_executable='pub_test', output='screen',
-            node_name='pub_test',
+            package='ros2_cpp_py', node_executable='ros2_pub_test', output='screen',
+            node_name='ros2_pub_test',
             parameters=[{"width": 1024, "height": 1024, "frame_rate": 30.0}],
             ),
         launch_ros.actions.Node(
-            package='ros2_cpp_py', node_executable='sub_test', output='screen',
-            node_name='sub_test',
+            package='ros2_cpp_py', node_executable='ros2_sub_test', output='screen',
+            node_name='ros2_sub_test',
             ),
     ])

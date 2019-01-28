@@ -33,19 +33,19 @@ ament_target_dependencies(cpp_test
   "rcutils"
 )
 
-add_executable(pub_test
+add_executable(ros2_pub_test
   src/pub_test.cpp
 )
-ament_target_dependencies(pub_test
+ament_target_dependencies(ros2_pub_test
   "cv_bridge"
   "rclcpp"
   "sensor_msgs"
 )
 
-add_executable(sub_test
+add_executable(ros2_sub_test
   src/sub_test.cpp
 )
-ament_target_dependencies(sub_test
+ament_target_dependencies(ros2_sub_test
   "rclcpp"
   "sensor_msgs"
 )
@@ -53,8 +53,8 @@ ament_target_dependencies(sub_test
 # Install cpp executables
 install(TARGETS
   cpp_test
-  pub_test
-  sub_test
+  ros2_pub_test
+  ros2_sub_test
 DESTINATION lib/${PROJECT_NAME}
 )
 
