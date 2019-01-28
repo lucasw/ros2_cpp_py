@@ -24,14 +24,14 @@ catkin_package(
 
 include_directories(${catkin_INCLUDE_DIRS})
 
-add_executable(pub_test src/pub_test.cpp)
-target_link_libraries(pub_test
+add_executable(ros1_pub_test src/pub_test.cpp)
+target_link_libraries(ros1_pub_test
   ${catkin_LIBRARIES}
   ${OpenCV_LIBRARIES}
 )
 
-add_executable(sub_test src/sub_test.cpp)
-target_link_libraries(sub_test
+add_executable(ros1_sub_test src/sub_test.cpp)
+target_link_libraries(ros1_sub_test
   ${catkin_LIBRARIES}
   ${OpenCV_LIBRARIES}
 )

@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<launch>
+  <node name="ros1_pub_test" pkg="ros2_cpp_py" type="ros1_pub_test"
+      output="screen">
+    <param name="frame_rate" value="30.0" />
+  </node>
+  <node name="ros1_sub_test" pkg="ros2_cpp_py" type="ros1_sub_test"
+      output="screen">
+  </node>
+</launch>

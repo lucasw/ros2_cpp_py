@@ -65,9 +65,8 @@ Color::Color()
   get_parameter_or("width", width_, width_);
   set_parameter_if_not_set("height", height_);
   get_parameter_or("height", height_, height_);
-  set_parameter_if_not_set("frame_rate", frame_rate_);
-  get_parameter_or("frame_rate", frame_rate_, frame_rate_);
 #endif
+  ros::param::get("~frame_rate", frame_rate_);
 
   pub_ = nh_.advertise<sensor_msgs::Image>("image", 10);
 
@@ -116,7 +115,7 @@ void Color::pubImage(const ros::TimerEvent& e)
 
 int main(int argc, char** argv)
 {
-  ros::init(argc, argv, "pub_test");
+  ros::init(argc, argv, "ros1_pub_test");
 
   // Force flush of the stdout buffer.
   // This ensures a correct sync of all prints
