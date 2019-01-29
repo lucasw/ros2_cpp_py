@@ -1,16 +1,12 @@
 #include <chrono>
-#include <deque>
 #include <rclcpp/rclcpp.hpp>
-#include <sensor_msgs/msg/image.hpp>
+#include <ros2_cpp_py/sub_test.hpp>
 
 using namespace std::chrono_literals;
 using std::placeholders::_1;
 
 
-class SubTest : public rclcpp::Node
-{
-public:
-  SubTest() : Node("cpptest")
+SubTest::SubTest() : Node("cpptest")
   {
     RCLCPP_INFO(get_logger(), "sub test");
     timer_ = this->create_wall_timer(4s, std::bind(&SubTest::update, this));
@@ -18,23 +14,17 @@ public:
         std::bind(&SubTest::callback, this, _1));
   }
 
-  ~SubTest()
+SubTest::~SubTest()
   {
     RCLCPP_INFO(get_logger(), "sub test shutting down");
   }
 
-private:
-  // TODO(lucasw) maybe keep the entire messages and analyze bandwidth
-  std::deque<rclcpp::Time> stamps_;
-
-  rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr sub_;
-  void callback(sensor_msgs::msg::Image::SharedPtr msg)
+void SubTest::callback(sensor_msgs::msg::Image::SharedPtr msg)
   {
     stamps_.push_back(msg->header.stamp);
   }
 
-  rclcpp::TimerBase::SharedPtr timer_;
-  void update()
+void SubTest::update()
   {
     auto cur = now();
 
@@ -60,12 +50,7 @@ private:
       RCLCPP_INFO(get_logger(), "messages per second %f", rate);
     }
   }
-};
 
-int main(int argc, char* argv[]) {
-  rclcpp::init(argc, argv);
-  auto sub_test = std::make_shared<SubTest>();
-  rclcpp::spin(sub_test);
-  rclcpp::shutdown();
-  return 0;
-}
+#include <class_loader/register_macro.hpp>
+
+CLASS_LOADER_REGISTER_CLASS(SubTest, rclcpp::Node)

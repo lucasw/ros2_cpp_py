@@ -38,6 +38,7 @@ ament_target_dependencies(cpp_test
 
 add_library(ros2_cpp_nodes SHARED
   src/pub_test.cpp
+  src/sub_test.cpp
 )
 ament_target_dependencies(ros2_cpp_nodes
   "class_loader"
@@ -50,14 +51,18 @@ add_executable(ros2_pub_test_standalone
   src/pub_test_standalone.cpp
 )
 target_link_libraries(ros2_pub_test_standalone ros2_cpp_nodes)
-ament_target_dependencies(ros2_pub_test_standalone rclcpp ros2_cpp_nodes)
-
-add_executable(ros2_sub_test
-  src/sub_test.cpp
+ament_target_dependencies(ros2_pub_test_standalone
+  rclcpp
+  ros2_cpp_nodes
 )
-ament_target_dependencies(ros2_sub_test
-  "rclcpp"
-  "sensor_msgs"
+
+add_executable(ros2_sub_test_standalone
+  src/sub_test_standalone.cpp
+)
+target_link_libraries(ros2_sub_test_standalone ros2_cpp_nodes)
+ament_target_dependencies(ros2_sub_test_standalone
+  rclcpp
+  ros2_cpp_nodes
 )
 
 install(TARGETS
@@ -71,7 +76,7 @@ install(TARGETS
 install(TARGETS
   cpp_test
   ros2_pub_test_standalone
-  ros2_sub_test
+  ros2_sub_test_standalone
 DESTINATION lib/${PROJECT_NAME}
 )
 
