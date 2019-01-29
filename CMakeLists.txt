@@ -65,6 +65,15 @@ ament_target_dependencies(ros2_sub_test_standalone
   ros2_cpp_nodes
 )
 
+add_executable(ros2_pub_sub_test
+  src/pub_sub_test.cpp
+)
+target_link_libraries(ros2_pub_sub_test ros2_cpp_nodes)
+ament_target_dependencies(ros2_pub_sub_test
+  rclcpp
+  ros2_cpp_nodes
+)
+
 install(TARGETS
   ros2_cpp_nodes
   ARCHIVE DESTINATION lib
@@ -77,6 +86,7 @@ install(TARGETS
   cpp_test
   ros2_pub_test_standalone
   ros2_sub_test_standalone
+  ros2_pub_sub_test
 DESTINATION lib/${PROJECT_NAME}
 )
 

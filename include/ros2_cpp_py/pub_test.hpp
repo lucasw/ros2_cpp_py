@@ -39,7 +39,7 @@ protected:
   int green_ = 255;
   int blue_= 255;
 
-  double frame_rate_ = 20.0;
+  double frame_rate_ = 40.0;
   void updateTimer();
 
   bool dirty_ = true;
