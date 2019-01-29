@@ -12,6 +12,7 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 find_package(ament_cmake REQUIRED)
+find_package(class_loader REQUIRED)
 find_package(cv_bridge REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rcutils REQUIRED)
@@ -25,6 +26,8 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   # DEPENDENCIES std_msgs
 )
 
+include_directories(include)
+
 add_executable(cpp_test
   src/cpp_test.cpp
 )
@@ -33,14 +36,21 @@ ament_target_dependencies(cpp_test
   "rcutils"
 )
 
-add_executable(ros2_pub_test
+add_library(ros2_cpp_nodes SHARED
   src/pub_test.cpp
 )
-ament_target_dependencies(ros2_pub_test
+ament_target_dependencies(ros2_cpp_nodes
+  "class_loader"
   "cv_bridge"
   "rclcpp"
   "sensor_msgs"
 )
+
+add_executable(ros2_pub_test_standalone
+  src/pub_test_standalone.cpp
+)
+target_link_libraries(ros2_pub_test_standalone ros2_cpp_nodes)
+ament_target_dependencies(ros2_pub_test_standalone rclcpp ros2_cpp_nodes)
 
 add_executable(ros2_sub_test
   src/sub_test.cpp
@@ -50,10 +60,17 @@ ament_target_dependencies(ros2_sub_test
   "sensor_msgs"
 )
 
+install(TARGETS
+  ros2_cpp_nodes
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+)
+
 # Install cpp executables
 install(TARGETS
   cpp_test
-  ros2_pub_test
+  ros2_pub_test_standalone
   ros2_sub_test
 DESTINATION lib/${PROJECT_NAME}
 )

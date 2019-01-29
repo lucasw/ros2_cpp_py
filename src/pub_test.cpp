@@ -21,33 +21,10 @@
 
 #include <cv_bridge/cv_bridge.h>
 #include <rclcpp/rclcpp.hpp>
+#include <ros2_cpp_py/pub_test.hpp>
 #include <sensor_msgs/msg/image.hpp>
 #include <sensor_msgs/image_encodings.hpp>
 using std::placeholders::_1;
-
-class Color : public rclcpp::Node
-{
-protected:
-  rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr pub_;
-
-  rclcpp::TimerBase::SharedPtr timer_;
-  void pubImage();
-
-  int width_ = 1024;
-  int height_ = 1024;
-  int red_ = 255;
-  int green_ = 255;
-  int blue_= 255;
-
-  double frame_rate_ = 20.0;
-  void updateTimer();
-
-  bool dirty_ = true;
-  cv::Mat image_;
-
-public:
-  Color();
-};
 
 Color::Color() : Node("color")
 {
@@ -108,16 +85,6 @@ void Color::pubImage()
   pub_->publish(cv_image.toImageMsg());
 }
 
-int main(int argc, char** argv)
-{
-  rclcpp::init(argc, argv);
+#include <class_loader/register_macro.hpp>
 
-  // Force flush of the stdout buffer.
-  // This ensures a correct sync of all prints
-  // even when executed simultaneously within a launch file.
-  setvbuf(stdout, NULL, _IONBF, BUFSIZ);
-  auto color = std::make_shared<Color>();
-  rclcpp::spin(color);
-  rclcpp::shutdown();
-  return 0;
-}
+CLASS_LOADER_REGISTER_CLASS(Color, rclcpp::Node)

@@ -38,7 +38,7 @@ def generate_launch_description():
             description='publish frame rate',
             ),
         launch_ros.actions.Node(
-            package='ros2_cpp_py', node_executable='ros2_pub_test', output='screen',
+            package='ros2_cpp_py', node_executable='ros2_pub_test_standalone', output='screen',
             node_name='ros2_pub_test',
             parameters=[{
                 "width": launch.substitutions.LaunchConfiguration('width'),
