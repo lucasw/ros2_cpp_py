@@ -6,9 +6,11 @@ using namespace std::chrono_literals;
 using std::placeholders::_1;
 
 
-SubTest::SubTest() : Node("cpptest")
+SubTest::SubTest() : Node("sub_test")
   {
     RCLCPP_INFO(get_logger(), "sub test");
+    get_parameter_or("update_period", update_period_, update_period_);
+    set_parameter_if_not_set("update_period", update_period_);
     timer_ = this->create_wall_timer(4s, std::bind(&SubTest::update, this));
     sub_ = create_subscription<sensor_msgs::msg::Image>("image",
         std::bind(&SubTest::callback, this, _1));
@@ -34,13 +36,13 @@ void SubTest::update()
     }
 
     // TODO(lucasw) make these threshold configurable
-    while ((((cur - stamps_.front()).nanoseconds() > 2e9) && (stamps_.size() > 50)) ||
+    while ((((cur - stamps_.front()).nanoseconds() > update_period_ * 1e9) && (stamps_.size() > 50)) ||
            (stamps_.size() > 200)) {
       stamps_.pop_front();
     }
 
     auto last_diff = cur - stamps_.back();
-    if (last_diff.nanoseconds() > 4e9) {
+    if (last_diff.nanoseconds() > update_period_ * 1e9) {
       RCLCPP_INFO(get_logger(), "time since last message %f", last_diff.nanoseconds() / 1e9);
     } else {
       const double rate = static_cast<double>(stamps_.size()) / ((cur - stamps_.front()).nanoseconds() / 1e9);
