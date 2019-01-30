@@ -18,4 +18,6 @@ private:
 
   rclcpp::TimerBase::SharedPtr timer_;
   void update();
+
+  float update_period_ = 4.0;
 };

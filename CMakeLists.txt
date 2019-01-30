@@ -47,6 +47,10 @@ ament_target_dependencies(ros2_cpp_nodes
   "sensor_msgs"
 )
 
+add_executable(pub_sub_composed src/pub_sub_composed.cpp)
+target_link_libraries(pub_sub_composed ros2_cpp_nodes)
+ament_target_dependencies(pub_sub_composed rclcpp ros2_cpp_nodes)
+
 add_executable(ros2_pub_test_standalone
   src/pub_test_standalone.cpp
 )
@@ -84,6 +88,7 @@ install(TARGETS
 # Install cpp executables
 install(TARGETS
   cpp_test
+  pub_sub_composed
   ros2_pub_test_standalone
   ros2_sub_test_standalone
   ros2_pub_sub_test
