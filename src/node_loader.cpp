@@ -34,8 +34,49 @@
 #include <class_loader/class_loader.hpp>
 #include <rclcpp/rclcpp.hpp>
 
+#ifdef __clang__
+// TODO(dirk-thomas) custom implementation until we can use libc++ 3.9
+#include <string>
+namespace fs
+{
+class path
+{
+public:
+  explicit path(const std::string & p)
+  : path_(p)
+  {}
+  bool is_absolute()
+  {
+    return path_[0] == '/';
+  }
+
+private:
+  std::string path_;
+};
+}  // namespace fs
+#else
+# include <experimental/filesystem>
+namespace fs = std::experimental::filesystem;
+#endif
+
 
 // based on demos/composition/api_composition.cpp 
+std::vector<std::string> split(
+  const std::string & s, char delim, bool skip_empty = false)
+{
+  std::vector<std::string> result;
+  std::stringstream ss;
+  ss.str(s);
+  std::string item;
+  while (std::getline(ss, item, delim)) {
+    if (skip_empty && item == "") {
+      continue;
+    }
+    result.push_back(item);
+  }
+  return result;
+}
+
 struct NodeLoader : public rclcpp::Node
 {
   NodeLoader() : Node("node_loader")
@@ -54,8 +95,9 @@ struct NodeLoader : public rclcpp::Node
 #endif
   }
 
-  bool load(const std::string& package_name)
+  bool load(const std::string& package_name, const std::string& node_plugin_name)
   {
+    const std::string full_node_plugin_name = package_name + "::" + node_plugin_name;
     // get node plugin resource from package
     std::string content;
     std::string base_path;
@@ -67,10 +109,49 @@ struct NodeLoader : public rclcpp::Node
     }
 
     RCLCPP_INFO(get_logger(), "%s %s", content.c_str(), base_path.c_str());
+    /** example output for package_name 'image_manip':
+image_manip::IIRImage;lib/libimagemanip.so
+image_manip::ImageDeque;lib/libimagemanip.so
+image_manip::SaveImage;lib/libimagemanip.so
+ /home/lucasw/colcon_ws/install/image_manip
+    */
+
+    std::vector<std::string> lines = split(content, '\n', true);
+    for (auto line : lines) {
+      std::vector<std::string> parts = split(line, ';');
+      if (parts.size() != 2) {
+        RCLCPP_ERROR(get_logger(), "Invalid resource entry %s", line.c_str());
+        continue;
+      }
+
+      std::string class_name = parts[0];
+
+      // load node plugin
+      std::string library_path = parts[1];
+
+      if (!fs::path(library_path).is_absolute()) {
+        library_path = base_path + "/" + library_path;
+      }
+      /**
+/home/lucasw/colcon_ws/install/image_manip/lib/libimagemanip.so image_manip::IIRImage
+/home/lucasw/colcon_ws/install/image_manip/lib/libimagemanip.so image_manip::ImageDeque
+/home/lucasw/colcon_ws/install/image_manip/lib/libimagemanip.so image_manip::SaveImage
+      */
+      std::cout << library_path << " " << class_name << "\n";
+
+      if (full_node_plugin_name == class_name) {
+        loadInner(library_path, full_node_plugin_name);
+      }
+    }
     return true;
   }
 
-  bool load(const std::string& library_path, const std::string& node_plugin_name,
+  bool loadInner(const std::string& library_path, const std::string& node_plugin_name)
+  {
+    std::shared_ptr<rclcpp::Node> node;
+    return loadInner(library_path, node_plugin_name, node);
+  }
+  bool loadInner(const std::string& library_path, const std::string& node_plugin_name,
       std::shared_ptr<rclcpp::Node> node)
   {
     std::shared_ptr<class_loader::ClassLoader> loader;
@@ -80,6 +161,15 @@ struct NodeLoader : public rclcpp::Node
       RCLCPP_ERROR(get_logger(), "Failed to load library: %s", ex.what());
       return false;
     }
+
+    #if 0
+    auto classes = loader->getAvailableClasses<rclcpp::Node>();
+    for (auto class_name : classes) {
+      if (class_name == node_plugin_name) {
+      }
+    }
+    #endif
+
     try {
       node = loader->createInstance<rclcpp::Node>(node_plugin_name);
     } catch (class_loader::CreateClassException & ex) {
@@ -116,7 +206,7 @@ int main(int argc, char * argv[])
   exec.add_node(node_loader);
 
   std::shared_ptr<rclcpp::Node> node;
-  node_loader->load(package);
+  node_loader->load(package, plugin);
 
   exec.spin();
   rclcpp::shutdown();

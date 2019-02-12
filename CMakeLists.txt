@@ -40,6 +40,9 @@ ament_target_dependencies(cpp_test
 add_executable(node_loader
   src/node_loader.cpp
 )
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+  target_link_libraries(node_loader "stdc++fs")
+endif()
 ament_target_dependencies(node_loader
   "ament_index_cpp"
   "class_loader"
