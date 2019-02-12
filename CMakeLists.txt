@@ -36,6 +36,16 @@ ament_target_dependencies(cpp_test
   "rcutils"
 )
 
+add_executable(node_loader
+  src/node_loader.cpp
+)
+ament_target_dependencies(node_loader
+  "class_loader"
+  "rclcpp"
+  "rcutils"
+)
+
+
 add_library(ros2_cpp_nodes SHARED
   src/pub_test.cpp
   src/sub_test.cpp
