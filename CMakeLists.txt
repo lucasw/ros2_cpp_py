@@ -12,6 +12,7 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 find_package(ament_cmake REQUIRED)
+find_package(ament_index_cpp REQUIRED)
 find_package(class_loader REQUIRED)
 find_package(cv_bridge REQUIRED)
 find_package(rclcpp REQUIRED)
@@ -40,6 +41,7 @@ add_executable(node_loader
   src/node_loader.cpp
 )
 ament_target_dependencies(node_loader
+  "ament_index_cpp"
   "class_loader"
   "rclcpp"
   "rcutils"
@@ -98,6 +100,7 @@ install(TARGETS
 # Install cpp executables
 install(TARGETS
   cpp_test
+  node_loader
   pub_sub_composed
   ros2_pub_test_standalone
   ros2_sub_test_standalone

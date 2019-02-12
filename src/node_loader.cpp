@@ -28,6 +28,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <ament_index_cpp/get_packages_with_prefixes.hpp>
+#include <ament_index_cpp/get_resource.hpp>
+#include <ament_index_cpp/get_search_paths.hpp>
 #include <class_loader/class_loader.hpp>
 #include <rclcpp/rclcpp.hpp>
 
@@ -37,10 +40,38 @@ struct NodeLoader : public rclcpp::Node
 {
   NodeLoader() : Node("node_loader")
   {
-
+#if 0
+    auto packages = ament_index_cpp::get_packages_with_prefixes();
+    for (auto pair : packages) {
+      std::cout << pair.first << " " << pair.second << "\n";
+    }
+#endif
+#if 0
+    auto paths = ament_index_cpp::get_search_paths();
+    for (auto path : paths) {
+      std::cout << path << "\n";
+    }
+#endif
   }
 
-  bool addNode(const std::string& library_path, const std::string& class_name)
+  bool load(const std::string& package_name)
+  {
+    // get node plugin resource from package
+    std::string content;
+    std::string base_path;
+    if (!ament_index_cpp::get_resource("node_plugin", package_name, content, &base_path))
+    {
+      RCLCPP_ERROR(get_logger(), "Could not find requested resource in ament index: %s",
+          package_name.c_str());
+      return false;
+    }
+
+    RCLCPP_INFO(get_logger(), "%s %s", content.c_str(), base_path.c_str());
+    return true;
+  }
+
+  bool load(const std::string& library_path, const std::string& node_plugin_name,
+      std::shared_ptr<rclcpp::Node> node)
   {
     std::shared_ptr<class_loader::ClassLoader> loader;
     try {
@@ -49,8 +80,17 @@ struct NodeLoader : public rclcpp::Node
       RCLCPP_ERROR(get_logger(), "Failed to load library: %s", ex.what());
       return false;
     }
-    auto node = loader->createInstance<rclcpp::Node>(class_name);
+    try {
+      node = loader->createInstance<rclcpp::Node>(node_plugin_name);
+    } catch (class_loader::CreateClassException & ex) {
+      RCLCPP_ERROR(get_logger(), "Failed to load node: %s", ex.what());
+      return false;
+    }
 
+    nodes_.push_back(node);
+    // TODO(lucasw) does this really need to be kept?
+    loaders_.push_back(loader);
+    return true;
   }
 
   std::vector<std::shared_ptr<class_loader::ClassLoader> > loaders_;
@@ -63,7 +103,21 @@ int main(int argc, char * argv[])
   setvbuf(stdout, NULL, _IONBF, BUFSIZ);
   rclcpp::init(argc, argv);
 
+  if (argc < 3) {
+    return 1;
+  }
+
+  const std::string package = argv[1];
+  const std::string plugin = argv[2];
+
+  rclcpp::executors::SingleThreadedExecutor exec;
+
   auto node_loader = std::make_shared<NodeLoader>();
-  rclcpp::spin(node_loader);
+  exec.add_node(node_loader);
+
+  std::shared_ptr<rclcpp::Node> node;
+  node_loader->load(package);
+
+  exec.spin();
   rclcpp::shutdown();
 }
