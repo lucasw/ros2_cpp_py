@@ -50,6 +50,15 @@ ament_target_dependencies(node_loader
   "rcutils"
 )
 
+add_executable(node_init src/node_init.cpp)
+ament_target_dependencies(node_init
+  "ament_index_cpp"
+  "class_loader"
+  "rclcpp"
+  "rcutils"
+)
+
+
 
 add_library(ros2_cpp_nodes SHARED
   src/pub_test.cpp
@@ -103,6 +112,7 @@ install(TARGETS
 # Install cpp executables
 install(TARGETS
   cpp_test
+  node_init
   node_loader
   pub_sub_composed
   ros2_pub_test_standalone
