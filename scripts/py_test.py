@@ -6,8 +6,8 @@
 import rclpy
 from rclpy.node import Node
 
-from ros2_cpp_py_package.msg import Test
-from ros2_cpp_py_package.srv import Test2
+from ros2_cpp_py.msg import Test
+from ros2_cpp_py.srv import Test2
 
 class PyTalker(Node):
     def __init__(self):
